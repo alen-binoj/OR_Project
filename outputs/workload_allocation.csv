@@ -1,0 +1,10 @@
+Workload,GPU,Allocated Units
+Chatbot,T4,300.0
+Chatbot,A10G,0.0
+Chatbot,A100,0.0
+Summarization,T4,100.0
+Summarization,A10G,100.0
+Summarization,A100,0.0
+Code_Auditing,T4,0.0
+Code_Auditing,A10G,150.0
+Code_Auditing,A100,0.0
