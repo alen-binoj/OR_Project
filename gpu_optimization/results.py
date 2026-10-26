@@ -66,7 +66,53 @@ def generate_results(
     )
     plt.close()
 
-    # STEP 3: Calculate the A100-only baseline
+    # STEP 3: Plot estimated latency against deadline
+    used = allocation_df[
+        allocation_df["Allocated Units"] > 0
+    ].copy()
+
+    used["Assignment"] = (
+        used["Workload"] + "\n(" + used["GPU"] + ")"
+    )
+
+    positions = list(range(len(used)))
+    width = 0.35
+
+    plt.figure(figsize=(10, 5))
+
+    plt.bar(
+        [p - width / 2 for p in positions],
+        used["Estimated Latency (ms)"],
+        width,
+        label="Estimated Latency"
+    )
+
+    plt.bar(
+        [p + width / 2 for p in positions],
+        used["Deadline (ms)"],
+        width,
+        label="Latency Deadline"
+    )
+
+    plt.xticks(
+        positions,
+        used["Assignment"],
+        rotation=15
+    )
+
+    plt.title("Estimated Latency vs Workload Deadline")
+    plt.xlabel("Workload and GPU Type")
+    plt.ylabel("Latency (milliseconds)")
+    plt.legend()
+    plt.tight_layout()
+
+    plt.savefig(
+        "outputs/latency_feasibility.png",
+        dpi=300
+    )
+    plt.close()
+
+    # STEP 4: Calculate A100-only baseline cost
     total_demand = sum(
         details["demand"]
         for details in workload_data.values()
@@ -75,7 +121,6 @@ def generate_results(
     a100_capacity = gpu_data["A100"]["capacity"]
     a100_cost = gpu_data["A100"]["cost_per_hour"]
 
-    # Round up because GPUs are provisioned as whole units
     baseline_gpu_count = math.ceil(
         total_demand / a100_capacity
     )
@@ -85,12 +130,12 @@ def generate_results(
     savings = baseline_cost - optimized_cost
 
     savings_percentage = (
-        (savings / baseline_cost) * 100
+        savings / baseline_cost * 100
         if baseline_cost > 0
         else 0
     )
 
-    # STEP 4: Save the cost comparison
+    # STEP 5: Save cost comparison CSV
     comparison_df = pd.DataFrame([
         {
             "Configuration": "Optimized",
@@ -109,7 +154,7 @@ def generate_results(
         index=False
     )
 
-    # STEP 5: Plot the cost comparison
+    # STEP 6: Plot cost comparison
     plt.figure(figsize=(8, 5))
 
     bars = plt.bar(
@@ -123,6 +168,7 @@ def generate_results(
 
     for bar in bars:
         height = bar.get_height()
+
         plt.text(
             bar.get_x() + bar.get_width() / 2,
             height,
@@ -139,15 +185,16 @@ def generate_results(
     )
     plt.close()
 
-    # STEP 6: Print the comparison summary
+    # STEP 7: Print comparison results
     print("\n===== COST COMPARISON =====")
     print(f"Optimized hourly cost: Rs. {optimized_cost:.2f}")
     print(f"A100-only hourly cost: Rs. {baseline_cost:.2f}")
     print(f"Hourly savings: Rs. {savings:.2f}")
     print(f"Percentage savings: {savings_percentage:.2f}%")
 
-    print("\n===== GENERATED GRAPHS =====")
+    print("\n===== GENERATED OUTPUT FILES =====")
     print("- outputs/gpu_provisioning.png")
     print("- outputs/workload_allocation.png")
+    print("- outputs/latency_feasibility.png")
     print("- outputs/cost_comparison.png")
     print("- outputs/cost_comparison.csv")

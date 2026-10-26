@@ -14,16 +14,16 @@ def main():
     # STEP 1: Create output directory
     os.makedirs("outputs", exist_ok=True)
 
-    # STEP 2: Run the optimization model
+    # STEP 2: Run optimization
     gpu_results, allocation_results, optimized_cost = (
         run_optimization()
     )
 
-    # STEP 3: Convert results into DataFrames
+    # STEP 3: Convert results to DataFrames
     gpu_df = pd.DataFrame(gpu_results)
     allocation_df = pd.DataFrame(allocation_results)
 
-    # STEP 4: Save the optimization results
+    # STEP 4: Save results as CSV files
     gpu_df.to_csv(
         "outputs/gpu_provisioning.csv",
         index=False
@@ -38,14 +38,28 @@ def main():
     print("\n===== OPTIMAL GPU PROVISIONING =====")
     print(gpu_df.to_string(index=False))
 
-    # STEP 6: Display non-zero workload allocations
+    # STEP 6: Display allocated workloads and latency
     print("\n===== WORKLOAD ALLOCATION =====")
 
     used_allocations = allocation_df[
         allocation_df["Allocated Units"] > 0
     ]
 
-    print(used_allocations.to_string(index=False))
+    display_columns = [
+        "Workload",
+        "GPU",
+        "Allocated Units",
+        "Estimated Latency (ms)",
+        "Deadline (ms)",
+        "Latency Feasible",
+        "VRAM Compatible"
+    ]
+
+    print(
+        used_allocations[display_columns].to_string(
+            index=False
+        )
+    )
 
     # STEP 7: Calculate demand and provisioned capacity
     total_demand = sum(
@@ -59,20 +73,20 @@ def main():
         for row in gpu_results
     )
 
-    # STEP 8: Display optimization summary
+    # STEP 8: Display summary
     print("\n===== OPTIMIZATION SUMMARY =====")
     print(f"Minimum Hourly Cost: Rs. {optimized_cost:.2f}")
     print(f"Total Workload Demand: {total_demand}")
     print(f"Total Provisioned Capacity: {total_capacity}")
 
-    # STEP 9: Generate graphs and compare costs
+    # STEP 9: Generate graphs and cost comparison
     generate_results(
         gpu_df,
         allocation_df,
         optimized_cost
     )
 
-    # STEP 10: Confirm CSV outputs
+    # STEP 10: Confirm CSV files
     print("\n===== SAVED CSV FILES =====")
     print("- outputs/gpu_provisioning.csv")
     print("- outputs/workload_allocation.csv")
