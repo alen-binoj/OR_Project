@@ -1,10 +1,10 @@
-Workload,GPU,Allocated Units
-Chatbot,T4,300.0
-Chatbot,A10G,0.0
-Chatbot,A100,0.0
-Summarization,T4,100.0
-Summarization,A10G,100.0
-Summarization,A100,0.0
-Code_Auditing,T4,0.0
-Code_Auditing,A10G,150.0
-Code_Auditing,A100,0.0
+Workload,GPU,Allocated Units,Estimated Latency (ms),Deadline (ms),Latency Feasible,VRAM Compatible
+Chatbot,T4,50.0,1800,2000,True,True
+Chatbot,A10G,0.0,1200,2000,True,True
+Chatbot,A100,250.0,800,2000,True,True
+Summarization,T4,0.0,4500,2500,False,True
+Summarization,A10G,0.0,3000,2500,False,True
+Summarization,A100,200.0,1800,2500,True,True
+Code_Auditing,T4,0.0,6000,4000,False,False
+Code_Auditing,A10G,0.0,4500,4000,False,True
+Code_Auditing,A100,150.0,2500,4000,True,True
